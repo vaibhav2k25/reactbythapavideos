@@ -9,7 +9,7 @@ import { EventHandling } from './components/EventHandling'
 import { EventProps } from './components/EventProps'
 import { Incrementer, SiblingComp } from './components/hooks/Incrementer'
 import { ToggleSwitch } from './components/projects/ToggleSwitch/ToggleSwitch'
-import { Todo } from './components/projects/ToggleSwitch/Todo/Todo'
+import { Todo } from './components/projects/Todo/Todo'
 
 function App() {
   const [count, setCount] = useState(0)

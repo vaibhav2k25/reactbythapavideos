@@ -67,8 +67,8 @@
     max-width: 500px;
     transition: background-color 200ms ease-in-out;
     width: 100%;
-    /* background-color: #f2f3f4; */
-    /* color: var(--primary-color); */
+    background-color: #f2f3f4;
+    color: var(--primary-color);
   }
   
   form input:hover {
