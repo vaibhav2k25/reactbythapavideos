@@ -6,10 +6,17 @@ import { MdDeleteForever } from "react-icons/md";
 export const Todo = () => {
     const [inputValue, setInputValue] = useState("");
     const [task, setTask] = useState([]);
+    const [dateTime, setDateTime] = useState("");
 
     const handleInputChange = (value) => {
         setInputValue(value);
     };
+    setInterval(() => {
+        const now = new Date();
+        const formattedDate = now.toLocaleDateString();
+        const formattedTime = now.toLocaleTimeString();
+        setDateTime(`${formattedDate} - ${formattedTime}`)
+    }, 1000);
     const handleFormSubmit = (event) => {
         event.preventDefault();
         if (!inputValue)
@@ -22,10 +29,18 @@ export const Todo = () => {
         setInputValue("");
         console.log(task);
     }
+    const handleDeleteTodo = (value)=>{
+        const updatedTask = task.filter((currTask)=>currTask!=value);
+        setTask(updatedTask);
+    }
+    const clearAllToDos = ()=>{
+        setTask([]);
+    }
     return (
         <section className="todo-container">
             <header>
                 <h1>Todo List</h1>
+                <h2 className="date-time">{dateTime}</h2>
             </header>
             <section className="form">
                 <form onSubmit={handleFormSubmit}>
@@ -38,20 +53,23 @@ export const Todo = () => {
                     </div>
                 </form>
             </section>
-            <section className="myUnOrdList {
-">
-                <u>
+            <section className="myUnOrdList"> 
+
+                <ul>
                     {
                         task.map((curTask, index) => {
                             return <li key={index} className="todo-item">
                                 <span>{curTask}</span>
                                 <button className="check-btn"><MdCheck /></button>
-                                <button className="delete-btn"><MdDeleteForever /></button>
+                                <button className="delete-btn" onClick={()=>handleDeleteTodo(curTask)}><MdDeleteForever /></button>
                             </li>
                         })
                     }
-                </u>
+                </ul>
 
+            </section>
+            <section>
+                <button className="clear-btn" onClick={()=>clearAllToDos()}>Clear All</button>
             </section>
         </section>
     );
