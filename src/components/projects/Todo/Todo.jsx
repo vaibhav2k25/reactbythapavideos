@@ -4,12 +4,17 @@ import { MdCheck } from "react-icons/md";
 import { MdDeleteForever } from "react-icons/md";
 
 export const Todo = () => {
-    const [inputValue, setInputValue] = useState("");
-    const [task, setTask] = useState([]);
+    const toDoKeyLocalStorage = "tododata";
+    const [inputValue, setInputValue] = useState({});
+    const [task, setTask] = useState(()=>{
+        const rawToDos = localStorage.getItem(toDoKeyLocalStorage);
+        if(!rawToDos) return [];
+        return JSON.parse(rawToDos);
+    });
     const [dateTime, setDateTime] = useState("");
 
     const handleInputChange = (value) => {
-        setInputValue(value);
+        setInputValue({ id: value, content: value, checked: false });
     };
     setInterval(() => {
         const now = new Date();
@@ -18,22 +23,37 @@ export const Todo = () => {
         setDateTime(`${formattedDate} - ${formattedTime}`)
     }, 1000);
     const handleFormSubmit = (event) => {
+        const { id, content, checked } = inputValue;
         event.preventDefault();
-        if (!inputValue)
+        if (!content)
             return;
-        if (task.includes(inputValue)) {
+        const ifTodoContentMatched = task.find((currTask) => currTask.content === content);
+        if (ifTodoContentMatched) return;
+        /* if (task.includes(inputValue)) {
             setInputValue("");
             return;
-        }
-        setTask((prevTask) => [...prevTask, inputValue]);
-        setInputValue("");
+        } */
+        setTask((prevTask) => [...prevTask, { id: id, content: content, checked: checked }]);
+        setInputValue({ id: "", content: "", checked: false });
         console.log(task);
     }
-    const handleDeleteTodo = (value)=>{
-        const updatedTask = task.filter((currTask)=>currTask!=value);
+
+    localStorage.setItem(toDoKeyLocalStorage,JSON.stringify(task));
+    const handleDeleteTodo = (value) => {
+        const updatedTask = task.filter((currTask) => currTask.content != value.content);
         setTask(updatedTask);
     }
-    const clearAllToDos = ()=>{
+    const handleCheckedTodo = (content) => {
+        const updatedTask = task.map((curTask) => {
+            if (curTask.content === content) {
+                return { ...curTask, checked: !curTask.checked };
+            } else {
+                return curTask;
+            }
+        });
+        setTask(updatedTask);
+    };
+    const clearAllToDos = () => {
         setTask([]);
     }
     return (
@@ -46,22 +66,22 @@ export const Todo = () => {
                 <form onSubmit={handleFormSubmit}>
                     <div>
                         <input type="text" className="todo-input" autoComplete="off"
-                            value={inputValue} onChange={(event) => handleInputChange(event.target.value)} />
+                            value={inputValue.content} onChange={(event) => handleInputChange(event.target.value)} />
                     </div>
                     <div>
                         <button type="submit" className="todo-btn">Add Task</button>
                     </div>
                 </form>
             </section>
-            <section className="myUnOrdList"> 
+            <section className="myUnOrdList">
 
                 <ul>
                     {
                         task.map((curTask, index) => {
-                            return <li key={index} className="todo-item">
-                                <span>{curTask}</span>
-                                <button className="check-btn"><MdCheck /></button>
-                                <button className="delete-btn" onClick={()=>handleDeleteTodo(curTask)}><MdDeleteForever /></button>
+                            return <li key={curTask.id} className="todo-item">
+                                <span className={curTask.checked ? "checkList" : "notCheckList"}>{curTask.content}</span>
+                                <button className="check-btn" onClick={() => handleCheckedTodo(curTask.content)}><MdCheck /></button>
+                                <button className="delete-btn" onClick={() => handleDeleteTodo(curTask)}><MdDeleteForever /></button>
                             </li>
                         })
                     }
@@ -69,7 +89,7 @@ export const Todo = () => {
 
             </section>
             <section>
-                <button className="clear-btn" onClick={()=>clearAllToDos()}>Clear All</button>
+                <button className="clear-btn" onClick={() => clearAllToDos()}>Clear All</button>
             </section>
         </section>
     );
